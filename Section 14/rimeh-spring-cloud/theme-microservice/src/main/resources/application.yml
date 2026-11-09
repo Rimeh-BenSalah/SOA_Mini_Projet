@@ -1,0 +1,51 @@
+server:
+  port: 8083
+spring:
+#  rabbitmq:
+#    host: "localhost"
+#    port: 5672
+#    username: "guest"
+#    password: "guest"
+  application:
+    name: theme
+  datasource:
+    url: 'jdbc:h2:mem:themedb'
+    #url: jdbc:mysql://mysqldb:3306/test?useSSL=false&serverTimezone=UTC
+    #username: root
+    #password: root
+  profiles:
+    active: "default"
+  config:
+    import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:9999}
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  cloud:
+    config:
+      enabled: true
+    discovery:
+      enabled: true
+eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+  client:
+    refresh:
+      enable: false
+    service-url:
+      #defaultZone: 'http://localhost:8761/eureka/'
+      defaultZone: ${DISCOVERY_SERVICE_URL:http://localhost:8761/eureka}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+build:
+  version: 1.0
+#author:
+  #name: "rimeh"
+  #email: "rimeh@gmail.com"

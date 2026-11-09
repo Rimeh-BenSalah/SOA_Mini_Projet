@@ -1,0 +1,66 @@
+server:
+  port: 8084
+spring:
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    username: "guest"
+    password: "guest"
+    connection-timeout: 10s
+  application:
+    name: livre
+  config:
+    import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:9999}
+  datasource:
+    url: 'jdbc:h2:mem:livresdb'
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  cloud:
+    function:
+      definition: updateCommunication
+    stream:
+      bindings:
+        sendCommunication-out-0:
+          destination: send-communication
+        updateCommunication-in-0:
+          destination: communication-sent
+          group: ${spring.application.name}
+    openfeign:
+     circuitbreaker:
+      enabled: true
+    config:
+      enabled: true
+    discovery:
+      enabled: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: ${DISCOVERY_SERVICE_URL:http://localhost:8761/eureka/}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+
+author:
+  name: "Rimeh Ben Salah"
+  email: "rimeh@example.com"
+
+resilience4j.circuitbreaker:
+  configs:
+   default:
+    slidingWindowSize: 10
+    permittedNumberOfCallsInHalfOpenState: 2
+    failureRateThreshold: 50
+    waitDurationInOpenState: 10000
